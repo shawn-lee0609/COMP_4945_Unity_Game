@@ -53,6 +53,7 @@ namespace GUI
         private BombLogic _bombLogic;
         private bool _isHost = false;
         private bool _gameActive = false;
+        private bool _myInputActive = false;
 
         // ── Rendering state ──
         private Dictionary<string, GameObject> _playerObjects = new();
@@ -103,11 +104,10 @@ namespace GUI
                     _mainThreadQueue.Dequeue()?.Invoke();
             }
 
-            if (!_gameActive) return;
-
-            // Handle player input
-            HandleInput();
-
+            // Only able to input when the player is alive
+            if (_myInputActive)
+                HandleInput();
+                      
             // Host checks bomb fuse timers
             if (_isHost)
                 CheckBombTimers();
@@ -336,6 +336,7 @@ namespace GUI
             hudPanel.SetActive(true);
             hudStatusText.text = "FIGHT!";
             _gameActive = true;
+            _myInputActive = true;
 
             // Center camera
             Camera.main.transform.position = new Vector3(
@@ -524,8 +525,10 @@ namespace GUI
                 go.transform.localScale *= 0.5f;
             }
             if (id == _network.MyPlayerId)
+            {
                 hudStatusText.text = "YOU DIED!";
-                _gameActive = false;
+                _myInputActive = false;
+            }
         }
 
         private void HandleGameOverVisual(string winnerId)
