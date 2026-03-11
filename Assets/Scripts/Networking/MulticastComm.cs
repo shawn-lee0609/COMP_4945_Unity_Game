@@ -273,7 +273,9 @@ namespace NetworkAPI
                 case MessageType.Join:
                     OnPlayerJoined?.Invoke(msg.SenderId, msg.Payload);
                     // Reply with our own join so the new player knows we exist
-                    SendJoin("");
+                    // Only reply to real joins (with a name), not to replies (empty payload)
+                    if (!string.IsNullOrEmpty(msg.Payload))
+                        SendJoin("");
                     break;
 
                 case MessageType.Leave:
