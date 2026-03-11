@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using NetworkAPI;
 using GameLogic;
+using System.Threading.Tasks;
 
 namespace GUI
 {
@@ -95,7 +96,7 @@ namespace GUI
 
         void Update()
         {
-            // Drain thread-safe queue
+            // Drain thread-safe queue (Main thread queue)
             lock (_queueLock)
             {
                 while (_mainThreadQueue.Count > 0)
@@ -175,11 +176,40 @@ namespace GUI
             _network.OnBombExplodedReceived += (bombId, x, y, cellsStr) => Enqueue(() =>
             {
                 var cells = BombLogic.DeserializeCells(cellsStr);
-                HandleExplosionVisual(bombId, cells);
+                
+                // Comapare the location of the bomb with the local BombID
+                var matchingBomb = _bombLogic.ActiveBombs.Values
+                    .FirstOrDefault(b => b.X == x && b.Y == y && !b.Exploded);
 
-                // Destroy walls in our local grid
+                if (matchingBomb != null)
+                {
+                    // If there is no matching bomb, it means that the bomb had explode
+                    matchingBomb.Exploded = true;
+
+                    // Reset HasBombActive so that the player can locate a new bomb
+                    if (_bombLogic.Players.TryGetValue(matchingBomb.OwnerId, out var owner))
+                        owner.HasBombActive = false;
+
+                    // Use the local bomb id to visually remove
+                    if (_bombObjects.TryGetValue(matchingBomb.BombId, out var bombGo))
+                    {
+                        Object.Destroy(bombGo);
+                        _bombObjects.Remove(matchingBomb.BombId);
+                    }
+                }
+
                 foreach (var (cx, cy) in cells)
+                {
+                    if (_wallObjects.TryGetValue((cx, cy), out var wallGo))
+                    {
+                        Object.Destroy(wallGo);
+                        _wallObjects.Remove((cx, cy));
+                    }
                     _grid.DestroyCell(cx, cy);
+
+                    var fx = Instantiate(explosionPrefab, GridToWorld(cx, cy), Quaternion.identity);
+                    Destroy(fx, 0.5f);
+                }
             });
 
             _network.OnPlayerDiedReceived += (id) => Enqueue(() =>
@@ -217,9 +247,21 @@ namespace GUI
                 var (sx, sy) = GridManager.SpawnPoints[spawnIndex];
                 _bombLogic.AddPlayer(_network.MyPlayerId, name, sx, sy);
 
-                // First player is the host
-                if (_bombLogic.Players.Count == 1)
-                    _isHost = true;
+                await Task.Delay(1500); // Returns the control of the Main thread so that 
+                                        // Update() - line 96 can run to retreive other players had joined or not
+                                        // This logic prevents each of the player thinking them as the host
+                                        // of the game which generates different map for each of the player.
+
+                // Drain the queue so we process received join messages
+                // Redundant line of code so that it can assure that there is nothing left
+                // in the main thread before operating the _isHost logic
+                lock(_queueLock)
+                {
+                    while (_mainThreadQueue.Count > 0)
+                        _mainThreadQueue.Dequeue()?.Invoke();
+                }
+
+                _isHost = (_bombLogic.Players.Count == 1);
 
                 startButton.interactable = _isHost;
                 statusText.text = _isHost
@@ -244,7 +286,7 @@ namespace GUI
                 return;
             }
 
-            // Host generates the grid and broadcasts it
+            // Host generates the grid and broadcasts it to the other players connected to the network
             _grid.Generate();
             string gridData = _grid.SerializeToString();
 
@@ -483,6 +525,7 @@ namespace GUI
             }
             if (id == _network.MyPlayerId)
                 hudStatusText.text = "YOU DIED!";
+                _gameActive = false;
         }
 
         private void HandleGameOverVisual(string winnerId)
