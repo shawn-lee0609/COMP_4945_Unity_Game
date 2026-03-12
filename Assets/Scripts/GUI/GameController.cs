@@ -53,12 +53,14 @@ namespace GUI
         private BombLogic _bombLogic;
         private bool _isHost = false;
         private bool _gameActive = false;
+        private bool _gameStarted = false;
         private bool _myInputActive = false;
 
         // ── Rendering state ──
         private Dictionary<string, GameObject> _playerObjects = new();
         private Dictionary<string, GameObject> _bombObjects = new();
         private Dictionary<(int, int), GameObject> _wallObjects = new();
+        private GameObject _gridRoot;
 
         // ── Input throttle ──
         private float _lastMoveTime = 0f;
@@ -111,6 +113,11 @@ namespace GUI
             // Host checks bomb fuse timers
             if (_isHost)
                 CheckBombTimers();
+            
+            if (!_gameActive && _gameStarted && Input.GetKeyDown(KeyCode.R))
+            {
+                RestartToLobby();
+            }
         }
 
         void OnDestroy()
@@ -261,7 +268,7 @@ namespace GUI
                         _mainThreadQueue.Dequeue()?.Invoke();
                 }
 
-                _isHost = (_bombLogic.Players.Count == 1);
+                _isHost = _bombLogic.Players.Keys.Min() == _network.MyPlayerId;
 
                 startButton.interactable = _isHost;
                 statusText.text = _isHost
@@ -337,12 +344,16 @@ namespace GUI
             hudStatusText.text = "FIGHT!";
             _gameActive = true;
             _myInputActive = true;
+            _gameStarted = true;
 
             // Center camera
             Camera.main.transform.position = new Vector3(
                 _grid.Width * cellSize / 2f, _grid.Height * cellSize / 2f, -10f);
             Camera.main.orthographicSize = _grid.Height * cellSize / 2f + 1f;
-
+            
+            if (_gridRoot != null) Destroy(_gridRoot);
+            _gridRoot = new GameObject("GridRoot");
+            
             // Render grid
             for (int x = 0; x < _grid.Width; x++)
             {
@@ -350,7 +361,7 @@ namespace GUI
                 {
                     Vector3 pos = GridToWorld(x, y);
 
-                    Instantiate(floorPrefab, pos, Quaternion.identity);
+                    Instantiate(floorPrefab, pos, Quaternion.identity).transform.SetParent(_gridRoot.transform);
 
                     var cell = _grid.GetCell(x, y);
                     if (cell == CellType.IndestructibleWall)
@@ -536,17 +547,20 @@ namespace GUI
             if (winnerId == "draw")
             {
                 hudStatusText.text = "DRAW!";
+                hudStatusText.text += "\nPress R to return to lobby";
                 Storage.ScoreStorage.RecordLoss();
             }
             else if (winnerId == _network.MyPlayerId)
             {
                 hudStatusText.text = "YOU WIN!";
+                hudStatusText.text += "\nPress R to return to lobby";
                 Storage.ScoreStorage.RecordWin();
             }
             else
             {
                 var w = _bombLogic.Players.GetValueOrDefault(winnerId);
                 hudStatusText.text = $"{w?.PlayerName ?? "?"} WINS!";
+                hudStatusText.text += "\nPress R to return to lobby";
                 Storage.ScoreStorage.RecordLoss();
             }
         }
@@ -562,6 +576,45 @@ namespace GUI
         private void Enqueue(System.Action action)
         {
             lock (_queueLock) { _mainThreadQueue.Enqueue(action); }
+        }
+        
+        private void RestartToLobby()
+        {
+            // Clear all visuals
+            foreach (var go in _playerObjects.Values) Destroy(go);
+            foreach (var go in _bombObjects.Values) Destroy(go);
+            foreach (var go in _wallObjects.Values) Destroy(go);
+            _playerObjects.Clear();
+            _bombObjects.Clear();
+            _wallObjects.Clear();
+
+            // Reset game logic
+            _grid = new GridManager();
+            _bombLogic = new BombLogic();
+            _isHost = false;
+            _gameStarted = false;
+            _myInputActive = false;
+
+            // Reset network — create a fresh instance so it can reconnect
+            _ = _network.DisconnectAsync();
+            #if ENABLE_SIGNALR
+                if (useSignalR)
+                    _network = new SignalRComm();
+                else
+            #endif
+            _network = new MulticastComm();
+            RegisterNetworkEvents(); // re-attach all event listeners to the new instance
+
+            // Reset UI back to lobby
+            hudPanel.SetActive(false);
+            lobbyPanel.SetActive(true);
+            nameInput.text = "";
+            statusText.text = "Enter your name to join.";
+            startButton.interactable = false;
+            joinButton.interactable = true; // 👈 re-enable join button
+            
+            if (_gridRoot != null) Destroy(_gridRoot);
+            _gridRoot = null;
         }
     }
 }
