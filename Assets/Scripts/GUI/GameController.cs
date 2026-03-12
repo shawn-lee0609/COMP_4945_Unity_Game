@@ -552,15 +552,14 @@ namespace GUI
             }
             else if (winnerId == _network.MyPlayerId)
             {
-                hudStatusText.text = "YOU WIN!";
-                hudStatusText.text += "\nPress R to return to lobby";
+                hudStatusText.text = "YOU WIN! \nPress R to return to lobby";
+                // hudStatusText.text += "\nPress R to return to lobby";
                 Storage.ScoreStorage.RecordWin();
             }
             else
             {
                 var w = _bombLogic.Players.GetValueOrDefault(winnerId);
-                hudStatusText.text = $"{w?.PlayerName ?? "?"} WINS!";
-                hudStatusText.text += "\nPress R to return to lobby";
+                hudStatusText.text = $"{w?.PlayerName ?? "?"} WINS! \nPress R to return to lobby"; 
                 Storage.ScoreStorage.RecordLoss();
             }
         }
