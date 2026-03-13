@@ -39,6 +39,7 @@ namespace NetworkAPI
         // ── Player identity ──
         private string _myPlayerId;
         public string MyPlayerId => _myPlayerId;
+        private string _myPlayerName;
 
         // ── Sequence number tracking for UDP reliability ──
         private int _sequenceNum = 0;
@@ -66,7 +67,8 @@ namespace NetworkAPI
         public Task ConnectAsync(string playerName)
         {
             // Generate a unique player ID (original used hardcoded "ID=1", "ID=2")
-            _myPlayerId = $"P_{System.Environment.MachineName}_{DateTime.Now.Ticks % 10000}";
+            _myPlayerId = $"P_{Guid.NewGuid().ToString().Substring(0, 8)}";
+            _myPlayerName = playerName ;
 
             // Configure the destination address of the multicast data using the pre-config address & Port number
             _multicastEP = new IPEndPoint(IPAddress.Parse(MULTICAST_ADDR), MULTICAST_PORT);
@@ -275,7 +277,20 @@ namespace NetworkAPI
                     // Reply with our own join so the new player knows we exist
                     // Only reply to real joins (with a name), not to replies (empty payload)
                     if (!string.IsNullOrEmpty(msg.Payload))
-                        SendJoin("");
+                    {
+                        SendMessage(new GameMessage
+                        {
+                            Type = MessageType.JoinReply,       
+                            SenderId = _myPlayerId,
+                            SequenceNum = _sequenceNum++,
+                            Payload = _myPlayerName             
+                        });
+                    }
+                    break;
+
+                case MessageType.JoinReply:                     
+                    OnPlayerJoined?.Invoke(msg.SenderId, msg.Payload);
+                    
                     break;
 
                 case MessageType.Leave:
