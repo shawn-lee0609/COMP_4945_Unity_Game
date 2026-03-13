@@ -1402,6 +1402,67 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1721676628}
   m_CullTransparentMesh: 1
+--- !u!1 &1735304526
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1735304527}
+  - component: {fileID: 1735304528}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1735304527
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1735304526}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: -0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1735304528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1735304526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fd430bae65244b89814e84cd3a1e1aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  musicSource: {fileID: 0}
+  sfxSource: {fileID: 0}
+  lobbyMusic: {fileID: 8300000, guid: 695d3b844ac564e0eaeb0a4bdfafbb2b, type: 3}
+  gameMusic: {fileID: 8300000, guid: 282c0c29550a841f0807d483c81e1cb9, type: 3}
+  buttonClickSound: {fileID: 8300000, guid: a85b6571710c2435989726c93678ae46, type: 3}
+  playerJoinSound: {fileID: 0}
+  gameStartSound: {fileID: 8300000, guid: 2266f2a4b580a4266b4e2341adab9b8f, type: 3}
+  bombPlaceSound: {fileID: 8300000, guid: 8cab67720ed8d42c892535f43549fc3e, type: 3}
+  bombExplodeSound: {fileID: 8300000, guid: b4488830d8b9e403281920d593f4da14, type: 3}
+  playerMoveSound: {fileID: 0}
+  playerDeathSound: {fileID: 8300000, guid: 01f9ff1add8a049e9a54a0b3d2880a9a, type: 3}
+  wallDestroySound: {fileID: 0}
+  victorySound: {fileID: 8300000, guid: 2efdbc7eabcb24e40a9457cd506c81ef, type: 3}
+  defeatSound: {fileID: 0}
+  masterVolume: 1
+  musicVolume: 0.5
+  sfxVolume: 0.7
 --- !u!1 &1885307321
 GameObject:
   m_ObjectHideFlags: 0
@@ -1728,3 +1789,4 @@ SceneRoots:
   - {fileID: 997690459}
   - {fileID: 1496799382}
   - {fileID: 1056329442}
+  - {fileID: 1735304527}

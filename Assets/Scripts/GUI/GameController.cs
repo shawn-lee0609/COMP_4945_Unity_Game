@@ -95,6 +95,10 @@ namespace GUI
             hudPanel.SetActive(false);
 
             RegisterNetworkEvents();
+
+            // play lobby bgm
+            if (AudioManager.Instance != null) 
+                AudioManager.Instance.PlayLobbyMusic();
         }
 
         void Update()
@@ -144,6 +148,10 @@ namespace GUI
                 }
                 UpdatePlayerListUI();
                 statusText.text = $"{name} joined! ({_bombLogic.Players.Count} players)";
+
+                // play sound effect whenever anyone joins the room
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlayPlayerJoin();
             });
 
             _network.OnPlayerLeft += (id) => Enqueue(() =>
@@ -235,6 +243,10 @@ namespace GUI
         // UI HANDLERS
         private async void OnJoinClicked()
         {
+            // play sound effect for button click
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayButtonClick();
+            
             string name = nameInput.text.Trim();
             if (string.IsNullOrEmpty(name))
             {
@@ -287,6 +299,10 @@ namespace GUI
 
         private void OnStartClicked()
         {
+            // play sound effect for button click
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayButtonClick();
+            
             if (!_isHost || _bombLogic.Players.Count < 2)
             {
                 statusText.text = "Need at least 2 players.";
@@ -345,6 +361,13 @@ namespace GUI
             _gameActive = true;
             _myInputActive = true;
             _gameStarted = true;
+
+            // play sound effect for game starting then play gameplay bgm
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayGameStart();
+                AudioManager.Instance.PlayGameMusic();
+            }
 
             // Center camera
             Camera.main.transform.position = new Vector3(
@@ -424,6 +447,10 @@ namespace GUI
                     _bombLogic.MovePlayer(_network.MyPlayerId, newX, newY);
                     UpdatePlayerVisual(_network.MyPlayerId, newX, newY);
 
+                    // play sound effect for player moving
+                    if (AudioManager.Instance != null)
+                        AudioManager.Instance.PlayPlayerMove();
+
                     // Broadcast to other players
                     _network.SendMove(newX, newY);
                 }
@@ -437,6 +464,10 @@ namespace GUI
                 {
                     SpawnBombVisual(bomb.BombId, bomb.X, bomb.Y);
                     _network.SendPlaceBomb(bomb.X, bomb.Y);
+
+                    // play sound effect when placing bomb
+                    if (AudioManager.Instance != null)
+                        AudioManager.Instance.PlayBombPlace();
                 }
             }
         }
@@ -515,6 +546,10 @@ namespace GUI
 
         private void HandleExplosionVisual(string bombId, List<(int x, int y)> cells)
         {
+            // play sound effect when bomb explodes
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayBombExplode();
+            
             if (_bombObjects.TryGetValue(bombId, out var bombGo))
             {
                 Destroy(bombGo);
@@ -527,6 +562,10 @@ namespace GUI
                 {
                     Destroy(wallGo);
                     _wallObjects.Remove((cx, cy));
+
+                    // play sound effect when a wall is destroyed
+                    if (AudioManager.Instance != null)
+                        AudioManager.Instance.PlayWallDestroy();
                 }
                 var fx = Instantiate(explosionPrefab, GridToWorld(cx, cy), Quaternion.identity);
                 Destroy(fx, 0.5f);
@@ -535,6 +574,10 @@ namespace GUI
 
         private void HandlePlayerDeathVisual(string id)
         {
+            // play sound effect when player dies
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayPlayerDeath();
+            
             if (_playerObjects.TryGetValue(id, out var go))
             {
                 var sr = go.GetComponent<SpriteRenderer>();
@@ -555,18 +598,30 @@ namespace GUI
                 hudStatusText.text = "DRAW!";
                 hudStatusText.text += "\nPress R to return to lobby";
                 Storage.ScoreStorage.RecordLoss();
+
+                // play sound effect for defeat/draw
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlayDefeat();
             }
             else if (winnerId == _network.MyPlayerId)
             {
                 hudStatusText.text = "YOU WIN! \nPress R to return to lobby";
                 // hudStatusText.text += "\nPress R to return to lobby";
                 Storage.ScoreStorage.RecordWin();
+
+                // play sound effect for victory
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlayVictory();
             }
             else
             {
                 var w = _bombLogic.Players.GetValueOrDefault(winnerId);
                 hudStatusText.text = $"{w?.PlayerName ?? "?"} WINS! \nPress R to return to lobby"; 
                 Storage.ScoreStorage.RecordLoss();
+
+                // play sound effect for defeat/draw
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlayDefeat();
             }
         }
 
@@ -617,6 +672,10 @@ namespace GUI
             statusText.text = "Enter your name to join.";
             startButton.interactable = false;
             joinButton.interactable = true; // 👈 re-enable join button
+
+            // play lobby bgm
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayLobbyMusic();
             
             if (_gridRoot != null) Destroy(_gridRoot);
             _gridRoot = null;
