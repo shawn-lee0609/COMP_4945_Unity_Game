@@ -370,9 +370,15 @@ namespace GUI
             }
 
             // Center camera
-            Camera.main.transform.position = new Vector3(
+            /*Camera.main.transform.position = new Vector3(
                 _grid.Width * cellSize / 2f, _grid.Height * cellSize / 2f, -10f);
-            Camera.main.orthographicSize = _grid.Height * cellSize / 2f + 1f;
+            Camera.main.orthographicSize = _grid.Height * cellSize / 2f + 1f;*/
+            
+            // Center camera for 3D view
+            float centerX = _grid.Width * cellSize / 2f;
+            float centerZ = _grid.Height * cellSize / 2f;
+            Camera.main.transform.position = new Vector3(centerX - 1f, 10f, -1f);
+            Camera.main.transform.rotation = Quaternion.Euler(60f, 0f, 0f);
             
             if (_gridRoot != null) Destroy(_gridRoot);
             _gridRoot = new GameObject("GridRoot");
@@ -508,24 +514,64 @@ namespace GUI
         }
 
         // VISUAL HELPERS
-        private Vector3 GridToWorld(int x, int y)
+        /*private Vector3 GridToWorld(int x, int y)
         {
             return new Vector3(x * cellSize, y * cellSize, 0f);
+        }*/
+        private Vector3 GridToWorld(int x, int y)
+        {
+            return new Vector3(x * cellSize, 0f, y * cellSize);
+            // X = left/right
+            // Y = 0 (ground level)
+            // Z = forward/back (was previously Y)
         }
 
-        private void SpawnPlayerVisual(string id, string name, int x, int y, Color color)
+        /*private void SpawnPlayerVisual(string id, string name, int x, int y, Color color)
         {
             var go = Instantiate(playerPrefab, GridToWorld(x, y), Quaternion.identity);
             go.name = $"Player_{name}";
             var sr = go.GetComponent<SpriteRenderer>();
             if (sr != null) sr.color = color;
             _playerObjects[id] = go;
+        }*/
+
+        private void SpawnPlayerVisual(string id, string name, int x, int y, Color color)
+        {
+            Vector3 pos = GridToWorld(x, y);
+            pos.y = 0.6f; // Capsule offset - puts bottom of capsule at ground level
+            var go = Instantiate(playerPrefab, pos, Quaternion.identity);
+            go.name = $"Player_{name}";
+
+            // For 3D objects, use Renderer instead of SpriteRenderer
+            var renderer = go.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material.color = color;
+            }
+            else
+            {
+                // Fallback for 2D sprites if you still have them
+                var sr = go.GetComponent<SpriteRenderer>();
+                if (sr != null) sr.color = color;
+            }
+
+            _playerObjects[id] = go;
         }
+
+        /*private void UpdatePlayerVisual(string id, int x, int y)
+        {
+            if (_playerObjects.TryGetValue(id, out var go))
+                go.transform.position = GridToWorld(x, y);
+        }*/
 
         private void UpdatePlayerVisual(string id, int x, int y)
         {
             if (_playerObjects.TryGetValue(id, out var go))
-                go.transform.position = GridToWorld(x, y);
+            {
+                Vector3 pos = GridToWorld(x, y);
+                pos.y = 0.6f; // Keep player at correct height when moving
+                go.transform.position = pos;
+            }
         }
 
         private void RemovePlayerVisual(string id)
@@ -537,9 +583,18 @@ namespace GUI
             }
         }
 
-        private void SpawnBombVisual(string bombId, int x, int y)
+        /*private void SpawnBombVisual(string bombId, int x, int y)
         {
             var go = Instantiate(bombPrefab, GridToWorld(x, y), Quaternion.identity);
+            go.name = $"Bomb_{bombId}";
+            _bombObjects[bombId] = go;
+        }*/
+
+        private void SpawnBombVisual(string bombId, int x, int y)
+        {
+            Vector3 pos = GridToWorld(x, y);
+            pos.y = 0.4f; // Sphere offset - puts bottom of sphere at ground level
+            var go = Instantiate(bombPrefab, pos, Quaternion.identity);
             go.name = $"Bomb_{bombId}";
             _bombObjects[bombId] = go;
         }

@@ -1,2 +1,25 @@
 fileFormatVersion: 2
 guid: d9ba413b27225ce48ae1ece1b1adc22b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - wallIndestructiblePrefab: {instanceID: 0}
+  - wallDestructiblePrefab: {instanceID: 0}
+  - floorPrefab: {instanceID: 0}
+  - playerPrefab: {instanceID: 0}
+  - bombPrefab: {instanceID: 0}
+  - explosionPrefab: {instanceID: 0}
+  - nameInput: {instanceID: 0}
+  - joinButton: {instanceID: 0}
+  - startButton: {instanceID: 0}
+  - statusText: {instanceID: 0}
+  - playerListText: {instanceID: 0}
+  - lobbyPanel: {instanceID: 0}
+  - hudPanel: {instanceID: 0}
+  - hudStatusText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

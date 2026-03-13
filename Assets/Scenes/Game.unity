@@ -20,9 +20,9 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientSkyColor: {r: 0.21176471, g: 0.22763316, b: 0.25882354, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
-  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientGroundColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
@@ -811,12 +811,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GUI.GameController
   useSignalR: 0
-  wallIndestructiblePrefab: {fileID: 2295832063381483985, guid: 855d3160888e80b4589218666bade6a1, type: 3}
-  wallDestructiblePrefab: {fileID: 1922924444162873372, guid: 5a259c7cc39d9d644ab603504ec41176, type: 3}
-  floorPrefab: {fileID: 8084396615839946410, guid: f06a4b634ef13bb4d9e8840577cfdf12, type: 3}
-  playerPrefab: {fileID: 6597196019348555786, guid: f6b6c5129b5d9664489264d57fd2fb5b, type: 3}
-  bombPrefab: {fileID: 7547777135804319000, guid: 349c3fcdd49af234b907415678132f55, type: 3}
-  explosionPrefab: {fileID: 9040074122609144235, guid: a3725fd865f96e640af08ffe514a2b29, type: 3}
+  wallIndestructiblePrefab: {fileID: 4026167799238955700, guid: 25d8ce08c675d4a8a97cc5629157693a, type: 3}
+  wallDestructiblePrefab: {fileID: 2335102512297642104, guid: 16f33971c8c1b464aba687876b333d57, type: 3}
+  floorPrefab: {fileID: 3724154999129161996, guid: 9b36cfb5d3e4d44efa98e052cf6c843f, type: 3}
+  playerPrefab: {fileID: 6320795740120161499, guid: 594dd888c2e8549b3842c322e4aece4b, type: 3}
+  bombPrefab: {fileID: 7139274407041769595, guid: 18f7b9aedadaf4ba0835abdcf71d0874, type: 3}
+  explosionPrefab: {fileID: 36504244869383687, guid: 6f4e67cf93cb24307b817349b9817ab6, type: 3}
   nameInput: {fileID: 885772189}
   joinButton: {fileID: 1280380981}
   startButton: {fileID: 771845948}
@@ -1267,7 +1267,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.14337842, g: 0.14337842, b: 0.16981131, a: 1}
+  m_BackGroundColor: {r: 0.5294118, g: 0.80784315, b: 0.92156863, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1291,7 +1291,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 7
   m_Depth: -1
   m_CullingMask:
@@ -1316,13 +1316,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1567894126}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.5, y: 5.5, z: -10}
+  m_LocalRotation: {x: 0.5735764, y: 0, z: 0, w: 0.8191521}
+  m_LocalPosition: {x: 5, y: 12, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 70, y: 0, z: 0}
 --- !u!1 &1721676628
 GameObject:
   m_ObjectHideFlags: 0
@@ -1452,14 +1452,14 @@ MonoBehaviour:
   gameMusic: {fileID: 8300000, guid: 282c0c29550a841f0807d483c81e1cb9, type: 3}
   buttonClickSound: {fileID: 8300000, guid: a85b6571710c2435989726c93678ae46, type: 3}
   playerJoinSound: {fileID: 0}
-  gameStartSound: {fileID: 8300000, guid: 2266f2a4b580a4266b4e2341adab9b8f, type: 3}
+  gameStartSound: {fileID: 8300000, guid: d05044d0a66794531906b9e7cdfa8075, type: 3}
   bombPlaceSound: {fileID: 8300000, guid: 8cab67720ed8d42c892535f43549fc3e, type: 3}
   bombExplodeSound: {fileID: 8300000, guid: b4488830d8b9e403281920d593f4da14, type: 3}
   playerMoveSound: {fileID: 0}
   playerDeathSound: {fileID: 8300000, guid: 01f9ff1add8a049e9a54a0b3d2880a9a, type: 3}
   wallDestroySound: {fileID: 0}
   victorySound: {fileID: 8300000, guid: 2efdbc7eabcb24e40a9457cd506c81ef, type: 3}
-  defeatSound: {fileID: 0}
+  defeatSound: {fileID: 8300000, guid: 9954259e81a964ba1ab58d7377a2307b, type: 3}
   masterVolume: 1
   musicVolume: 0.5
   sfxVolume: 0.7
