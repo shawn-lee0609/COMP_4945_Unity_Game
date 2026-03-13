@@ -379,14 +379,20 @@ namespace GUI
 
             // Render players
             Color[] playerColors = { Color.green, Color.red, Color.blue, Color.yellow };
-            int colorIdx = 0;
-            foreach (var p in _bombLogic.Players.Values)
+
+            // Sort all the players based on their player Id alphabetically so that they can be assigned
+            // with their dedicated cell color
+            var sortedPlayerIds = _bombLogic.Players.Keys.OrderBy(id => id).ToList();
+
+            for (int i = 0; i < sortedPlayerIds.Count; i++)
             {
-                SpawnPlayerVisual(p.PlayerId, p.PlayerName, p.X, p.Y,
-                    p.PlayerId == _network.MyPlayerId
-                        ? Color.green
-                        : playerColors[colorIdx % playerColors.Length]);
-                colorIdx++;
+                string playerId = sortedPlayerIds[i];
+                var p = _bombLogic.Players[playerId];
+
+                // Assign a fixed cell based on the index
+                Color assignedColor = playerColors[i % playerColors.Length];
+
+                SpawnPlayerVisual(p.PlayerId, p.PlayerName, p.X, p.Y, assignedColor);
             }
         }
 
