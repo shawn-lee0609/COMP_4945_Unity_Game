@@ -712,11 +712,11 @@ namespace GUI
 
             // Reset network — create a fresh instance so it can reconnect
             _ = _network.DisconnectAsync();
-            #if ENABLE_SIGNALR
+#if ENABLE_SIGNALR
                 if (useSignalR)
                     _network = new SignalRComm();
                 else
-            #endif
+#endif
             _network = new MulticastComm();
             RegisterNetworkEvents(); // re-attach all event listeners to the new instance
 
