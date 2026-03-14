@@ -32,6 +32,9 @@ namespace NetworkAPI
         public string MyPlayerId => _myPlayerId;
         public bool IsConnected => _connection?.State == HubConnectionState.Connected;
 
+        private bool _isHostFromServer = false;
+        public bool IsHost => _isHostFromServer;
+
         // ── Events (same as MulticastComm — that's the whole point) ──
         public event Action<string, string> OnPlayerJoined;
         public event Action<string> OnPlayerLeft;
@@ -85,6 +88,12 @@ namespace NetworkAPI
             {
                 _myPlayerId = id;
             });
+
+            _connection.On<bool>("OnHostAssigned", (isHost) =>
+{
+    _isHostFromServer = isHost;
+    Debug.Log($"[SignalRComm] Host assigned: {isHost}");
+});
 
             _connection.On<string, string>("OnPlayerJoined", (id, name) =>
             {

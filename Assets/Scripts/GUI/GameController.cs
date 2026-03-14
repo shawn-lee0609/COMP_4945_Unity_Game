@@ -280,6 +280,12 @@ namespace GUI
                         _mainThreadQueue.Dequeue()?.Invoke();
                 }
 
+                //_isHost = _bombLogic.Players.Keys.Min() == _network.MyPlayerId;
+#if ENABLE_SIGNALR
+if (useSignalR)
+    _isHost = ((SignalRComm)_network).IsHost;
+else
+#endif
                 _isHost = _bombLogic.Players.Keys.Min() == _network.MyPlayerId;
 
                 startButton.interactable = _isHost;
