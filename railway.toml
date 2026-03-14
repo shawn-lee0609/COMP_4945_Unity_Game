@@ -1,7 +1,11 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd Server && dotnet restore && dotnet publish -c Release -o out"
 
-[deploy]
-startCommand = "cd Server/out && dotnet Server.dll"
-restartPolicyType = "always"
+[phases.setup]
+nixPkgs = ["dotnet-sdk_8"]
+
+[phases.build]
+cmds = ["cd Server && dotnet restore && dotnet publish -c Release -o out"]
+
+[start]
+cmd = "cd Server/out && dotnet Server.dll"
