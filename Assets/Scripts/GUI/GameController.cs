@@ -23,7 +23,7 @@ namespace GUI
         // ══════════════════════════════════════════════
         [Header("Network Mode")]
         [Tooltip("Check for SignalR/WebSocket (WAN), uncheck for UDP Multicast (LAN)")]
-        public bool useSignalR = false;
+        public bool useSignalR = true;
 
         [Header("Prefabs — assign in Inspector")]
         public GameObject wallIndestructiblePrefab;

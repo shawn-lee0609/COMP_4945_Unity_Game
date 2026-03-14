@@ -25,7 +25,7 @@ namespace NetworkAPI
     public class SignalRComm : INetworkComm
     {
         // ── Change this URL to your deployed server ──
-        private const string SERVER_URL = "http://localhost:5000/gamehub";
+        private const string SERVER_URL = "https://comp4945unitygame-production.up.railway.app";
 
         private HubConnection _connection;
         private string _myPlayerId = "";
