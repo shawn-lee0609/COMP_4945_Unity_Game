@@ -66,7 +66,8 @@ namespace NetworkAPI
         public Task ConnectAsync(string playerName)
         {
             // Generate a unique player ID (original used hardcoded "ID=1", "ID=2")
-            _myPlayerId = $"P_{System.Environment.MachineName}_{DateTime.Now.Ticks % 10000}";
+            //_myPlayerId = $"P_{System.Environment.MachineName}_{DateTime.Now.Ticks % 10000}";
+			_myPlayerId = $"P_{Guid.NewGuid().ToString().Substring(0, 8)}";
 
             // Configure the destination address of the multicast data using the pre-config address & Port number
             _multicastEP = new IPEndPoint(IPAddress.Parse(MULTICAST_ADDR), MULTICAST_PORT);
