@@ -810,7 +810,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9ba413b27225ce48ae1ece1b1adc22b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GUI.GameController
-  useSignalR: 0
+  useSignalR: 1
   wallIndestructiblePrefab: {fileID: 4026167799238955700, guid: 25d8ce08c675d4a8a97cc5629157693a, type: 3}
   wallDestructiblePrefab: {fileID: 2335102512297642104, guid: 16f33971c8c1b464aba687876b333d57, type: 3}
   floorPrefab: {fileID: 3724154999129161996, guid: 9b36cfb5d3e4d44efa98e052cf6c843f, type: 3}
