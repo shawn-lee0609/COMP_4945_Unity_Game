@@ -76,13 +76,18 @@ namespace GUI
             _grid = new GridManager();
             _bombLogic = new BombLogic();
 
-            // ── THE SWAP: one line controls LAN vs WAN ──
-#if ENABLE_SIGNALR
-            if (useSignalR)
-                _network = new SignalRComm();
-            else
-#endif
+#if UNITY_WEBGL && ENABLE_SIGNALR
+    // WebGL: use JS bridge implementation
+    var webglComm = gameObject.AddComponent<SignalRCommWebGL>();
+    _network = webglComm;
+#elif ENABLE_SIGNALR
+    if (useSignalR)
+        _network = new SignalRComm();
+    else
+        _network = new MulticastComm();
+#else
             _network = new MulticastComm();
+#endif
         }
 
         void Start()
@@ -266,27 +271,32 @@ namespace GUI
                 var (sx, sy) = GridManager.SpawnPoints[spawnIndex];
                 _bombLogic.AddPlayer(_network.MyPlayerId, name, sx, sy);
 
-                await Task.Delay(1500); // Returns the control of the Main thread so that 
-                                        // Update() - line 96 can run to retreive other players had joined or not
-                                        // This logic prevents each of the player thinking them as the host
-                                        // of the game which generates different map for each of the player.
+#if UNITY_WEBGL && ENABLE_SIGNALR
+                await ((SignalRCommWebGL)_network).DelayAsync(1.5f);
+#else
+                await Task.Delay(1500);
+#endif
 
                 // Drain the queue so we process received join messages
                 // Redundant line of code so that it can assure that there is nothing left
                 // in the main thread before operating the _isHost logic
-                lock(_queueLock)
+                lock (_queueLock)
                 {
                     while (_mainThreadQueue.Count > 0)
                         _mainThreadQueue.Dequeue()?.Invoke();
                 }
 
                 //_isHost = _bombLogic.Players.Keys.Min() == _network.MyPlayerId;
-#if ENABLE_SIGNALR
-if (useSignalR)
-    _isHost = ((SignalRComm)_network).IsHost;
-else
-#endif
+#if UNITY_WEBGL && ENABLE_SIGNALR
+    _isHost = ((SignalRCommWebGL)_network).IsHost;
+#elif ENABLE_SIGNALR
+    if (useSignalR)
+        _isHost = ((SignalRComm)_network).IsHost;
+    else
+        _isHost = _bombLogic.Players.Keys.Min() == _network.MyPlayerId;
+#else
                 _isHost = _bombLogic.Players.Keys.Min() == _network.MyPlayerId;
+#endif
 
                 startButton.interactable = _isHost;
                 statusText.text = _isHost
@@ -718,12 +728,21 @@ else
 
             // Reset network — create a fresh instance so it can reconnect
             _ = _network.DisconnectAsync();
-#if ENABLE_SIGNALR
-                if (useSignalR)
-                    _network = new SignalRComm();
-                else
-#endif
+#if UNITY_WEBGL && ENABLE_SIGNALR
+    // Destroy the OLD component to prevent duplicate SendMessage callbacks
+    var oldComm = gameObject.GetComponent<SignalRCommWebGL>();
+    if (oldComm != null) Destroy(oldComm);
+    
+    var webglComm = gameObject.AddComponent<SignalRCommWebGL>();
+    _network = webglComm;
+#elif ENABLE_SIGNALR
+    if (useSignalR)
+        _network = new SignalRComm();
+    else
+        _network = new MulticastComm();
+#else
             _network = new MulticastComm();
+#endif
             RegisterNetworkEvents(); // re-attach all event listeners to the new instance
 
             // Reset UI back to lobby
@@ -732,7 +751,7 @@ else
             nameInput.text = "";
             statusText.text = "Enter your name to join.";
             startButton.interactable = false;
-            joinButton.interactable = true; // 👈 re-enable join button
+            joinButton.interactable = true; // re-enable join button
 
             // play lobby bgm
             if (AudioManager.Instance != null)

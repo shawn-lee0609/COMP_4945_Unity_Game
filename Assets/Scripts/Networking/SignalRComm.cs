@@ -25,7 +25,7 @@ namespace NetworkAPI
     public class SignalRComm : INetworkComm
     {
         // ── Change this URL to your deployed server ──
-        private const string SERVER_URL = "https://bombermanserver-production.up.railway.app/gamehub";
+        private const string SERVER_URL = "https://bomberman-slee.canadacentral.cloudapp.azure.com/gamehub";
 
         private HubConnection _connection;
         private string _myPlayerId = "";
